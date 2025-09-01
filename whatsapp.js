@@ -169,6 +169,11 @@ class WhatsAppBot {
             return await this.sendWelcomeMessage(from);
         }
         
+        // For specific route queries (station to station), use AI
+        if (lowerText.includes(' to ') && (lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price'))) {
+            return await this.sendAIResponse(from, text);
+        }
+        
         // For detailed queries, use AI
         if (lowerText.includes('list all') || lowerText.includes('all stations') || 
             lowerText.includes('complete') || lowerText.includes('detailed') ||
@@ -181,7 +186,9 @@ class WhatsAppBot {
             return await this.sendRouteInfo(from);
         }
         
-        if (lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price') || lowerText.includes('ticket')) {
+        // Only use simple fare response for general fare queries
+        if ((lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price') || lowerText.includes('ticket')) 
+            && !lowerText.includes(' to ')) {
             return await this.sendFareInfo(from);
         }
         
@@ -214,23 +221,56 @@ class WhatsAppBot {
     // Send AI-powered response
     async sendAIResponse(to, message) {
         try {
+            console.log('Sending AI request for message:', message);
             const baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN ? 
                 `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 
                 'https://web-production-a3061.up.railway.app';
+            
             const response = await axios.post(`${baseUrl}/api/whatsapp/chat`, {
                 message: message,
                 from: to
+            }, {
+                timeout: 10000 // 10 second timeout
             });
+            
+            console.log('AI response received:', response.data);
             
             if (response.data && response.data.response) {
                 return await this.sendTextMessage(to, response.data.response);
             } else {
-                return await this.sendTextMessage(to, "I'm sorry, I couldn't process your request. Please try again or use the buttons below.");
+                console.log('No response data, falling back to simple response');
+                return await this.sendSimpleResponse(to, message);
             }
         } catch (error) {
-            console.error('AI response error:', error);
-            return await this.sendTextMessage(to, "I'm having trouble processing your request. Please try again or use the buttons below.");
+            console.error('AI response error:', error.message);
+            console.log('Falling back to simple response for:', message);
+            return await this.sendSimpleResponse(to, message);
         }
+    }
+
+    // Fallback simple response when AI fails
+    async sendSimpleResponse(to, message) {
+        const lowerText = message.toLowerCase();
+        
+        // Try to provide a basic response based on keywords
+        if (lowerText.includes(' to ') && lowerText.includes('fare')) {
+            return await this.sendTextMessage(to, `💰 *Fare Information*\n\nFor specific route fares like "${message}", please use the fare calculator or contact Pune Metro customer service.\n\n*General Fare Range:* ₹10 - ₹35\n\n*Quick Options:*\n• Short distance: ₹10-15\n• Medium distance: ₹20-25\n• Long distance: ₹30-35\n\nNeed more details? Use the buttons below!`);
+        }
+        
+        if (lowerText.includes('route') || lowerText.includes('station')) {
+            return await this.sendRouteInfo(to);
+        }
+        
+        if (lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price')) {
+            return await this.sendFareInfo(to);
+        }
+        
+        if (lowerText.includes('time') || lowerText.includes('schedule')) {
+            return await this.sendScheduleInfo(to);
+        }
+        
+        // Default fallback
+        return await this.sendTextMessage(to, "I understand you're asking about: " + message + "\n\nFor detailed information, please use the buttons below or try rephrasing your question.");
     }
 
     // Send welcome message
