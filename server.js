@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const OpenAI = require('openai');
 const bodyParser = require('body-parser');
 const WhatsAppBot = require('./whatsapp');
-require('dotenv').config({ path: './config.env' });
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,12 +31,22 @@ let stationSynonyms = {};
 
 async function loadKnowledgeBase() {
   try {
+    console.log('Loading knowledge base...');
     knowledgeBase = await fs.readJson('./pune_metro_knowledge.json');
+    console.log('Knowledge base loaded successfully');
+    
     const faqContent = await fs.readFile('./faq_qa.jsonl', 'utf8');
     faqData = faqContent.trim().split('\n').map(line => JSON.parse(line));
+    console.log('FAQ data loaded successfully');
+    
     stationSynonyms = await fs.readJson('./station_synonyms.json');
+    console.log('Station synonyms loaded successfully');
   } catch (error) {
     console.error('Error loading knowledge base:', error);
+    // Initialize with empty data if files don't exist
+    knowledgeBase = {};
+    faqData = [];
+    stationSynonyms = {};
   }
 }
 
@@ -338,7 +348,16 @@ app.get('/admin', (req, res) => {
 // Initialize and start server
 loadKnowledgeBase().then(() => {
   app.listen(PORT, () => {
-    console.log(`Pune Metro Chatbot running on http://localhost:${PORT}`);
-    console.log(`WhatsApp webhook: http://localhost:${PORT}/webhook`);
+    console.log(`Pune Metro Chatbot running on port ${PORT}`);
+    console.log(`WhatsApp webhook: /webhook`);
+    console.log('Environment variables loaded:', {
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Missing',
+      WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN ? 'Set' : 'Missing',
+      WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID ? 'Set' : 'Missing',
+      WHATSAPP_VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN ? 'Set' : 'Missing'
+    });
   });
+}).catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
