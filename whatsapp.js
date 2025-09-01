@@ -9,6 +9,7 @@ class WhatsAppBot {
         this.baseUrl = `https://graph.facebook.com/${this.apiVersion}`;
         this.processedMessages = new Set(); // Track processed messages to prevent duplicates
         this.userSessions = new Map(); // Track user sessions to show welcome only once per day
+        this.recentMessages = new Map(); // Track recent messages with timestamps
     }
 
     // Verify webhook for WhatsApp
@@ -139,8 +140,10 @@ class WhatsAppBot {
         console.log('Processing message:', JSON.stringify(messageData, null, 2));
         const { from, text, type } = messageData;
         
-        // Create a unique message ID for deduplication (without timestamp)
-        const messageId = `${from}_${type}_${JSON.stringify(text)}`;
+        // Create a unique message ID for deduplication using content hash
+        const crypto = require('crypto');
+        const contentHash = crypto.createHash('md5').update(JSON.stringify({from, type, text})).digest('hex');
+        const messageId = `${from}_${type}_${contentHash}`;
         
         // Check if we've already processed this message
         if (this.processedMessages.has(messageId)) {
@@ -148,12 +151,32 @@ class WhatsAppBot {
             return null;
         }
         
+        // Check for recent duplicate messages (within 5 seconds)
+        const now = Date.now();
+        const recentKey = `${from}_${type}_${contentHash}`;
+        if (this.recentMessages.has(recentKey)) {
+            const lastTime = this.recentMessages.get(recentKey);
+            if (now - lastTime < 5000) { // 5 seconds
+                console.log('Recent duplicate message detected, skipping:', recentKey);
+                return null;
+            }
+        }
+        
         // Add to processed messages (keep only last 100 to prevent memory issues)
         this.processedMessages.add(messageId);
+        this.recentMessages.set(recentKey, now);
         console.log('Processing new message:', messageId);
+        // Clean up old processed messages
         if (this.processedMessages.size > 100) {
             const firstMessage = this.processedMessages.values().next().value;
             this.processedMessages.delete(firstMessage);
+        }
+        
+        // Clean up old recent messages (older than 30 seconds)
+        for (const [key, timestamp] of this.recentMessages.entries()) {
+            if (now - timestamp > 30000) {
+                this.recentMessages.delete(key);
+            }
         }
         
         if (type === 'text' && text) {
