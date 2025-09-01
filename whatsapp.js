@@ -20,6 +20,13 @@ class WhatsAppBot {
     // Send text message
     async sendTextMessage(to, text) {
         try {
+            console.log('Sending WhatsApp message:', { to, text });
+            console.log('Using credentials:', {
+                phoneNumberId: this.phoneNumberId,
+                accessToken: this.accessToken ? 'Set' : 'Missing',
+                baseUrl: this.baseUrl
+            });
+
             const response = await axios.post(
                 `${this.baseUrl}/${this.phoneNumberId}/messages`,
                 {
@@ -37,7 +44,16 @@ class WhatsAppBot {
             );
             return response.data;
         } catch (error) {
-            console.error('WhatsApp send error:', error.response?.data || error.message);
+            console.error('WhatsApp send error:', {
+                message: error.message,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                config: {
+                    url: error.config?.url,
+                    method: error.config?.method
+                }
+            });
             throw error;
         }
     }
