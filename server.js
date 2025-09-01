@@ -368,6 +368,21 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({
+    status: 'OK',
+    openai: !!openai,
+    knowledgeBase: Object.keys(knowledgeBase).length,
+    faqCount: faqData.length,
+    synonymsCount: Object.keys(stationSynonyms).length,
+    env: {
+      OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
+      NODE_ENV: process.env.NODE_ENV
+    }
+  });
+});
+
 // Initialize and start server
 loadKnowledgeBase().then(() => {
   app.listen(PORT, () => {
