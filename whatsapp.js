@@ -8,6 +8,7 @@ class WhatsAppBot {
         this.apiVersion = 'v18.0';
         this.baseUrl = `https://graph.facebook.com/${this.apiVersion}`;
         this.processedMessages = new Set(); // Track processed messages to prevent duplicates
+        this.userSessions = new Map(); // Track user sessions to show welcome only once per day
     }
 
     // Verify webhook for WhatsApp
@@ -172,6 +173,67 @@ class WhatsAppBot {
         return null;
     }
 
+    // Check if message is a genuine greeting (not a query with greeting words)
+    isGenuineGreeting(lowerText) {
+        // Only show welcome for very short, simple greetings
+        const simpleGreetings = [
+            'hi', 'hello', 'hey', 'start', 'begin', 'help', 'menu', 'options'
+        ];
+        
+        // Check if it's just a simple greeting (1-2 words)
+        const words = lowerText.trim().split(/\s+/);
+        
+        // If it's just 1-2 words and contains a greeting
+        if (words.length <= 2) {
+            return simpleGreetings.some(greeting => lowerText.includes(greeting));
+        }
+        
+        // If it's longer, only show welcome if it's clearly a greeting without any metro-related keywords
+        const metroKeywords = [
+            'metro', 'route', 'station', 'fare', 'ticket', 'line', 'time', 'schedule',
+            'pune', 'pcmc', 'swargate', 'vanaz', 'ramwadi', 'civil court'
+        ];
+        
+        const hasMetroKeywords = metroKeywords.some(keyword => lowerText.includes(keyword));
+        
+        // Only show welcome if it's a greeting AND doesn't contain metro keywords
+        if (hasMetroKeywords) {
+            return false;
+        }
+        
+        // Check if it starts with a greeting
+        return simpleGreetings.some(greeting => lowerText.startsWith(greeting));
+    }
+
+    // Check if we should show welcome message (only once per day per user)
+    shouldShowWelcome(from) {
+        const today = new Date().toDateString();
+        const lastWelcomeDate = this.userSessions.get(from);
+        
+        // Show welcome if it's a new day or first time user
+        if (!lastWelcomeDate || lastWelcomeDate !== today) {
+            this.userSessions.set(from, today);
+            
+            // Clean up old sessions (keep only last 30 days worth)
+            if (this.userSessions.size > 1000) {
+                const entries = Array.from(this.userSessions.entries());
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - 30);
+                const cutoffString = cutoffDate.toDateString();
+                
+                for (const [userId, date] of entries) {
+                    if (date < cutoffString) {
+                        this.userSessions.delete(userId);
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+
     // Handle text messages
     async handleTextMessage(from, text) {
         if (!text) {
@@ -181,8 +243,8 @@ class WhatsAppBot {
         
         const lowerText = text.toLowerCase();
         
-        // Welcome message for first interaction
-        if (lowerText.includes('hi') || lowerText.includes('hello') || lowerText.includes('start')) {
+        // Welcome message only for genuine greetings or first-time interactions
+        if (this.isGenuineGreeting(lowerText) && this.shouldShowWelcome(from)) {
             return await this.sendWelcomeMessage(from);
         }
         
