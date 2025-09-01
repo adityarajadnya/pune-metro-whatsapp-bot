@@ -169,43 +169,67 @@ class WhatsAppBot {
             return await this.sendWelcomeMessage(from);
         }
         
-        // Route information
+        // For detailed queries, use AI
+        if (lowerText.includes('list all') || lowerText.includes('all stations') || 
+            lowerText.includes('complete') || lowerText.includes('detailed') ||
+            lowerText.length > 20) {
+            return await this.sendAIResponse(from, text);
+        }
+        
+        // Quick responses for simple queries
         if (lowerText.includes('route') || lowerText.includes('line') || lowerText.includes('station')) {
             return await this.sendRouteInfo(from);
         }
         
-        // Fare information
         if (lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price') || lowerText.includes('ticket')) {
             return await this.sendFareInfo(from);
         }
         
-        // Schedule information
         if (lowerText.includes('time') || lowerText.includes('schedule') || lowerText.includes('hour')) {
             return await this.sendScheduleInfo(from);
         }
         
-        // Festival information
         if (lowerText.includes('ganesh') || lowerText.includes('festival') || lowerText.includes('ganeshotsav')) {
             return await this.sendFestivalInfo(from);
         }
         
-        // Default: send options
-        return await this.sendOptions(from);
+        // Default: use AI for complex queries
+        return await this.sendAIResponse(from, text);
     }
 
     // Handle button clicks
     async handleButtonClick(from, buttonId) {
         switch (buttonId) {
-            case 'btn_0':
+            case 'qr_0':
                 return await this.sendRouteInfo(from);
-            case 'btn_1':
+            case 'qr_1':
                 return await this.sendFareInfo(from);
-            case 'btn_2':
+            case 'qr_2':
                 return await this.sendScheduleInfo(from);
-            case 'btn_3':
-                return await this.sendFestivalInfo(from);
             default:
                 return await this.sendOptions(from);
+        }
+    }
+
+    // Send AI-powered response
+    async sendAIResponse(to, message) {
+        try {
+            const baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN ? 
+                `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 
+                'https://web-production-a3061.up.railway.app';
+            const response = await axios.post(`${baseUrl}/api/whatsapp/chat`, {
+                message: message,
+                from: to
+            });
+            
+            if (response.data && response.data.response) {
+                return await this.sendTextMessage(to, response.data.response);
+            } else {
+                return await this.sendTextMessage(to, "I'm sorry, I couldn't process your request. Please try again or use the buttons below.");
+            }
+        } catch (error) {
+            console.error('AI response error:', error);
+            return await this.sendTextMessage(to, "I'm having trouble processing your request. Please try again or use the buttons below.");
         }
     }
 
@@ -247,6 +271,41 @@ Just type your question or use the buttons below!`;
 • Swargate (Terminal)
 • Vanaz (Terminal)
 • Ramwadi (Terminal)
+
+*Complete Station Lists:*
+
+*Purple Line Stations:*
+1. PCMC
+2. Sant Tukaram Nagar
+3. Bhosari
+4. Kasarwadi
+5. Phugewadi
+6. Dapodi
+7. Bopodi
+8. Khadki
+9. Shivaji Nagar
+10. Civil Court (District Court)
+11. Pune Railway Station
+12. Budhwar Peth
+13. Mandai
+14. Swargate
+
+*Aqua Line Stations:*
+1. Vanaz
+2. Anand Nagar
+3. Ideal Colony
+4. Nal Stop
+5. Garware College
+6. Deccan Gymkhana
+7. Chhatrapati Sambhaji Udyan
+8. PMC
+9. Civil Court (District Court)
+10. Mangalwar Peth
+11. Pune Railway Station
+12. Ruby Hall Clinic
+13. Bund Garden
+14. Yerawada
+15. Ramwadi
 
 Need specific station info? Just ask!`;
         
