@@ -1,0 +1,259 @@
+/* Admin Interface Styles */
+
+/* Tab transitions */
+.tab-btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.tab-btn:hover {
+    transform: translateY(-1px);
+}
+
+.tab-content {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Modal animations */
+.modal-enter {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Form focus effects */
+input:focus, textarea:focus {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* Button hover effects */
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Loading spinner */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Notification animations */
+.notification-enter {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Card hover effects */
+.bg-gray-50:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Tag styles */
+.tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.tag:hover {
+    transform: scale(1.05);
+}
+
+/* JSON editor improvements */
+#knowledge-editor {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    line-height: 1.5;
+    tab-size: 2;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .tab-btn {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .modal > div {
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+    }
+}
+
+/* Custom scrollbar for JSON editor */
+#knowledge-editor::-webkit-scrollbar {
+    width: 8px;
+}
+
+#knowledge-editor::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+#knowledge-editor::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+#knowledge-editor::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-success {
+    background-color: #10b981;
+}
+
+.status-error {
+    background-color: #ef4444;
+}
+
+.status-warning {
+    background-color: #f59e0b;
+}
+
+.status-info {
+    background-color: #3b82f6;
+}
+
+/* Enhanced accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .bg-white {
+        background-color: #374151;
+    }
+    
+    .bg-gray-50 {
+        background-color: #4b5563;
+    }
+    
+    .text-gray-800 {
+        color: #f9fafb;
+    }
+    
+    .text-gray-600 {
+        color: #d1d5db;
+    }
+    
+    .border-gray-200 {
+        border-color: #6b7280;
+    }
+    
+    .border-gray-300 {
+        border-color: #9ca3af;
+    }
+    
+    #knowledge-editor {
+        background-color: #1f2937;
+        color: #f9fafb;
+        border-color: #6b7280;
+    }
+}
+
+/* Focus management */
+.focus-visible {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+}
+
+.tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 20;
+}
+
+.tooltip:hover::before {
+    opacity: 1;
+}

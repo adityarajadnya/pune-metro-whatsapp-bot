@@ -1,0 +1,183 @@
+/* Custom styles for Pune Metro Chatbot */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+#chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Message animations */
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#chat-messages > div:last-child {
+    animation: slideInFromBottom 0.3s ease-out;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Voice button animation */
+#voice-btn:active {
+    transform: scale(0.95);
+}
+
+/* Input focus effects */
+#message-input:focus {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* Button hover effects */
+#send-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    #chat-messages {
+        padding-bottom: 1rem;
+    }
+}
+
+/* Typing indicator */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-width: 80px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6b7280;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Pune Metro specific colors */
+.bg-purple-600 {
+    background-color: #7c3aed;
+}
+
+.bg-purple-700 {
+    background-color: #6d28d9;
+}
+
+.bg-purple-100 {
+    background-color: #f3e8ff;
+}
+
+.text-purple-600 {
+    color: #7c3aed;
+}
+
+.text-purple-200 {
+    color: #c4b5fd;
+}
+
+.border-purple-500 {
+    border-color: #8b5cf6;
+}
+
+.focus\:ring-purple-500:focus {
+    --tw-ring-color: #8b5cf6;
+}
+
+/* Enhanced accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .bg-white {
+        background-color: #374151;
+    }
+    
+    .text-gray-800 {
+        color: #f9fafb;
+    }
+    
+    .text-gray-600 {
+        color: #d1d5db;
+    }
+    
+    .border-gray-200 {
+        border-color: #4b5563;
+    }
+    
+    .border-gray-300 {
+        border-color: #6b7280;
+    }
+}

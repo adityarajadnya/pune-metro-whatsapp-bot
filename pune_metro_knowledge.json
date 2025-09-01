@@ -1,0 +1,497 @@
+{
+  "schema_version": "1.0",
+  "knowledge": {
+    "version": "1.0",
+    "last_updated_utc": "2025-09-01T16:17:17Z",
+    "source_notes": [
+      "Fares and station-to-station examples derived from uploaded Fare-Chart-E.jpeg",
+      "Festival timetable derived from Time-Table-new-2.jpg (Ganeshotsav 2025)",
+      "General rules, discounts, passes from Pune-Metro-Commuter-Guide.pdf"
+    ],
+    "network": {
+      "lines": [
+        {
+          "id": "purple",
+          "display_name": "Purple Line",
+          "termini": [
+            "PCMC",
+            "Swargate"
+          ],
+          "interchanges": [
+            "Civil Court (District Court)"
+          ],
+          "stations_ordered": [
+            "PCMC",
+            "Sant Tukaram Nagar",
+            "Bhosari",
+            "Kasarwadi",
+            "Phugewadi",
+            "Dapodi",
+            "Bopodi",
+            "Khadki",
+            "Shivaji Nagar",
+            "Civil Court (District Court)",
+            "Pune Railway Station",
+            "Budhwar Peth",
+            "Mandai",
+            "Swargate"
+          ]
+        },
+        {
+          "id": "aqua",
+          "display_name": "Aqua Line",
+          "termini": [
+            "Vanaz",
+            "Ramwadi"
+          ],
+          "interchanges": [
+            "Civil Court (District Court)"
+          ],
+          "stations_ordered": [
+            "Vanaz",
+            "Anand Nagar",
+            "Ideal Colony",
+            "Nal Stop",
+            "Garware College",
+            "Deccan Gymkhana",
+            "Chhatrapati Sambhaji Udyan",
+            "PMC",
+            "Civil Court (District Court)",
+            "Pune Railway Station",
+            "Ruby Hall Clinic",
+            "Bund Garden",
+            "Yerwada",
+            "Kalyani Nagar",
+            "Ramwadi"
+          ]
+        }
+      ],
+      "global_interchanges": [
+        {
+          "name": "Civil Court (District Court)",
+          "connects_lines": [
+            "purple",
+            "aqua"
+          ]
+        }
+      ]
+    },
+    "tickets_and_fares": {
+      "fare_band": {
+        "min_inr": 10,
+        "max_inr": 35
+      },
+      "products": [
+        {
+          "id": "single_journey_qr",
+          "name": "Single Journey QR",
+          "channels": [
+            "whatsapp",
+            "mobile_app",
+            "tvm_counter"
+          ]
+        },
+        {
+          "id": "daily_pass",
+          "name": "Daily Pass",
+          "price_inr": 100,
+          "validity": "unlimited rides during service hours on day of purchase"
+        },
+        {
+          "id": "ncmc_card",
+          "name": "One Pune (NCMC RuPay) Card",
+          "issue_fee_inr": 100,
+          "annual_fee_inr": 75,
+          "tap_in_out": true,
+          "txn_limit_inr": 2000,
+          "daily_contactless_txn_cap": 20,
+          "support_phone": "022-4500-0800"
+        },
+        {
+          "id": "vidyarthi_pass",
+          "name": "Vidyarthi (Student) Pass",
+          "discount_percent": 30,
+          "applies_days": "Mon–Sun",
+          "carrier": "NCMC card"
+        }
+      ],
+      "discounts": [
+        {
+          "label": "weekday_smartcard",
+          "percent": 10,
+          "days": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri"
+          ]
+        },
+        {
+          "label": "weekend_smartcard",
+          "percent": 30,
+          "days": [
+            "Sat",
+            "Sun"
+          ]
+        }
+      ],
+      "fares_examples_inr": [
+        {
+          "from": "PCMC",
+          "to": "Shivaji Nagar",
+          "fare": 25
+        },
+        {
+          "from": "PCMC",
+          "to": "Civil Court (District Court)",
+          "fare": 25
+        },
+        {
+          "from": "PCMC",
+          "to": "Swargate",
+          "fare": 30
+        },
+        {
+          "from": "Vanaz",
+          "to": "Ruby Hall Clinic",
+          "fare": 20
+        },
+        {
+          "from": "Vanaz",
+          "to": "Ramwadi",
+          "fare": 25
+        },
+        {
+          "from": "Civil Court (District Court)",
+          "to": "Ramwadi",
+          "fare": 20
+        },
+        {
+          "from": "PCMC",
+          "to": "Sant Tukaram Nagar",
+          "fare": 10
+        },
+        {
+          "from": "PCMC",
+          "to": "Bhosari",
+          "fare": 15
+        },
+        {
+          "from": "PCMC",
+          "to": "Kasarwadi",
+          "fare": 15
+        },
+        {
+          "from": "Vanaz",
+          "to": "Anand Nagar",
+          "fare": 10
+        },
+        {
+          "from": "Vanaz",
+          "to": "Deccan Gymkhana",
+          "fare": 15
+        },
+        {
+          "from": "Vanaz",
+          "to": "PMC",
+          "fare": 20
+        },
+        {
+          "from": "Pune Railway Station",
+          "to": "Ruby Hall Clinic",
+          "fare": 15
+        },
+        {
+          "from": "Pune Railway Station",
+          "to": "Bund Garden",
+          "fare": 20
+        },
+        {
+          "from": "Pune Railway Station",
+          "to": "Yerwada",
+          "fare": 25
+        }
+      ],
+      "whatsapp_ticketing_number_e164": "+919420101990",
+      "helpline": "1800-270-5501",
+      "notes": "Use full matrix from Fare-Chart-E.jpeg for complete coverage."
+    },
+    "service_hours": {
+      "typical": {
+        "purple": {
+          "start": "06:00",
+          "end": "23:00",
+          "timezone": "Asia/Kolkata"
+        },
+        "aqua": {
+          "start": "06:00",
+          "end": "23:00",
+          "timezone": "Asia/Kolkata"
+        },
+        "notes": "Operational windows may vary by station and day; check latest posters."
+      },
+      "special_events": [
+        {
+          "name": "Ganeshotsav 2025 - Regular days",
+          "dates_local": [
+            "2025-08-27",
+            "2025-08-28", 
+            "2025-08-29",
+            "2025-08-30",
+            "2025-08-31"
+          ],
+          "window": {
+            "start": "06:00",
+            "end": "23:00",
+            "timezone": "Asia/Kolkata"
+          },
+          "notes": "Regular operating hours during initial festival period"
+        },
+        {
+          "name": "Ganeshotsav 2025 - Extended hours",
+          "dates_local": [
+            "2025-09-01",
+            "2025-09-02",
+            "2025-09-03", 
+            "2025-09-04",
+            "2025-09-05"
+          ],
+          "window": {
+            "start": "06:00",
+            "end": "24:00",
+            "timezone": "Asia/Kolkata"
+          },
+          "notes": "Extended service until 2:00 AM midnight during peak festival period"
+        },
+        {
+          "name": "Ganeshotsav 2025 - Gauri Pujan",
+          "date_local": "2025-09-01",
+          "window": {
+            "start": "06:00",
+            "end": "24:00",
+            "timezone": "Asia/Kolkata"
+          },
+          "notes": "Special extended hours for Gauri Pujan celebration"
+        },
+        {
+          "name": "Ganeshotsav 2025 - Anant Chaturdashi Continuous Service",
+          "from_local": "2025-09-06T06:00+05:30",
+          "to_local": "2025-09-07T23:00+05:30",
+          "notes": "41 hours of continuous service for Anant Chaturdashi celebrations"
+        },
+        {
+          "name": "Ganeshotsav 2025 - Regular Schedule Resumption",
+          "date_local": "2025-09-08",
+          "notes": "Services resume normal operating hours (06:00-23:00)"
+        }
+      ]
+    },
+    "feeder_services": {
+      "operator": "PMPML (in partnership with Pune Metro)",
+      "fares_inr": [
+        5,
+        10,
+        15
+      ],
+      "routes_examples": [
+        {
+          "name": "Ramwadi ↔ Kharadi IT Park",
+          "headway": "~15 min"
+        },
+        {
+          "name": "Kalyani Nagar ↔ Magarpatta/Hadapsar",
+          "headway": "~45 min (scaling)"
+        },
+        {
+          "name": "PCMC ↔ Chinchwad",
+          "headway": "~15 min"
+        }
+      ]
+    },
+    "accessibility_and_rules": {
+      "access": [
+        "Lifts & escalators at stations",
+        "Tactile guidance paths",
+        "Help Points and emergency intercoms on platforms/trains",
+        "Toilets & drinking water at major stations",
+        "Cycles permitted on trains (follow staff guidance)"
+      ],
+      "luggage_policy": {
+        "max_weight_kg": 25,
+        "max_dimensions_cm": [
+          80,
+          50,
+          30
+        ],
+        "notes": "One personal bag; follow security instructions."
+      },
+      "prohibited": [
+        "Alcohol/smoking",
+        "Explosives, arms, sharp objects",
+        "Flammable liquids and gases (incl. cylinders)",
+        "Hazardous chemicals",
+        "Narcotics"
+      ]
+    },
+    "contacts": {
+      "customer_care_phone": "1800-270-5501",
+      "customer_care_email": "customercare.pmrp@mahametro.org",
+      "general_email": "mail.pune@mahametro.org",
+      "address": "A2/A3 Block, District Court Interchange Metro Station, Nyaymurti Ranade Path, Shivajinagar, Pune-411005"
+    },
+    "synonyms": {
+      "Civil Court (District Court)": [
+        "Civil Court",
+        "District Court",
+        "Civil Court Interchange",
+        "CVC"
+      ],
+      "Pune Railway Station": [
+        "Pune Station",
+        "PRS"
+      ],
+      "Sant Tukaram Nagar": [
+        "STG"
+      ],
+      "Shivaji Nagar": [
+        "SJN",
+        "Shivajinagar"
+      ],
+      "Ruby Hall Clinic": [
+        "RHC"
+      ],
+      "Bund Garden": [
+        "BUN"
+      ],
+      "Kasarwadi": [
+        "KWA"
+      ],
+      "Phugewadi": [
+        "PGD"
+      ]
+    }
+  },
+  "qa_samples": [
+    {
+      "q": "Where do the Purple and Aqua lines interchange?",
+      "a": "At Civil Court (District Court), which connects Purple (PCMC–Swargate) and Aqua (Vanaz–Ramwadi).",
+      "tags": [
+        "network",
+        "interchange"
+      ],
+      "evidence": [
+        "Fare-Chart-E.jpeg",
+        "Pune-Metro-Commuter-Guide.pdf"
+      ]
+    },
+    {
+      "q": "What are Pune Metro's usual operating hours?",
+      "a": "Typically 06:00–23:00 on both Purple and Aqua lines (Asia/Kolkata). Timings may vary by station and day.",
+      "tags": [
+        "service_hours"
+      ],
+      "evidence": [
+        "Time-Table-new-2.jpg",
+        "Pune-Metro-Commuter-Guide.pdf"
+      ]
+    },
+    {
+      "q": "How much is a Pune Metro ticket?",
+      "a": "Single-journey fares range from ₹10 to ₹35 depending on distance. A ₹100 Daily Pass allows unlimited rides for the day.",
+      "tags": [
+        "fares"
+      ],
+      "evidence": [
+        "Fare-Chart-E.jpeg",
+        "Pune-Metro-Commuter-Guide.pdf"
+      ]
+    },
+    {
+      "q": "Is there a student discount?",
+      "a": "Yes. With the Vidyarthi (Student) Pass on an NCMC card, students get 30% off every ride, Mon–Sun.",
+      "tags": [
+        "discounts",
+        "students"
+      ],
+      "evidence": [
+        "Pune-Metro-Commuter-Guide.pdf"
+      ]
+    },
+    {
+      "q": "How do I buy a WhatsApp ticket?",
+      "a": "Save +91 94201 01990, send 'Hi', select journey and pay to receive a QR ticket.",
+      "tags": [
+        "ticketing"
+      ],
+      "evidence": [
+        "Pune-Metro-Commuter-Guide.pdf"
+      ]
+    },
+    {
+      "q": "Are bicycles allowed on Pune Metro?",
+      "a": "Yes, bicycles are allowed. Follow staff guidance for entry gates and off-peak use.",
+      "tags": [
+        "accessibility",
+        "cycles"
+      ],
+      "evidence": [
+        "Pune-Metro-Commuter-Guide.pdf"
+      ]
+    }
+  ],
+  "nlu": {
+    "intents": [
+      {
+        "name": "fare_between_stations",
+        "slots": [
+          "from_station",
+          "to_station"
+        ],
+        "handler": "lookup_fare_matrix_or_examples"
+      },
+      {
+        "name": "first_last_train",
+        "slots": [
+          "line",
+          "station?",
+          "date?"
+        ],
+        "handler": "service_window_for_date"
+      },
+      {
+        "name": "discount_info",
+        "slots": [
+          "audience? (student|senior|general)"
+        ],
+        "handler": "list_discounts"
+      },
+      {
+        "name": "ticketing_howto",
+        "slots": [
+          "channel? (whatsapp|app|tvm|ncmc)"
+        ],
+        "handler": "describe_ticketing_steps"
+      },
+      {
+        "name": "feeder_info",
+        "slots": [
+          "location?"
+        ],
+        "handler": "nearest_feeder_examples"
+      },
+      {
+        "name": "rules_policy",
+        "slots": [
+          "topic? (luggage|prohibited|etiquette)"
+        ],
+        "handler": "policy_lookup"
+      },
+      {
+        "name": "contact_info",
+        "slots": [],
+        "handler": "contact_lookup"
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "pune-metro-chatbot",
+  "version": "1.0.0",
+  "description": "Pune Metro Chatbot with Admin Interface",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch",
+    "vercel-build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "openai": "^4.20.1",
+    "multer": "^1.4.5-lts.1",
+    "fs-extra": "^11.1.1",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.0",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "tailwindcss": "^3.3.5"
+  },
+  "keywords": ["chatbot", "pune-metro", "ai", "admin", "whatsapp"],
+  "author": "Pune Metro",
+  "license": "MIT"
+}
