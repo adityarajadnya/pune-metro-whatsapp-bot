@@ -114,7 +114,15 @@ Keep responses concise and informative.
     res.json({ response });
   } catch (error) {
     console.error('Chat error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Please try again'
+    });
   }
 });
 
