@@ -350,8 +350,8 @@ Keep responses concise and informative for WhatsApp format.
 
     const response = completion.choices[0].message.content;
     
-    // Send response via WhatsApp
-    await whatsappBot.sendTextMessage(from, response);
+    // Don't send response here - let the calling function handle it
+    // await whatsappBot.sendTextMessage(from, response);
     
     res.json({ success: true, response });
   } catch (error) {
