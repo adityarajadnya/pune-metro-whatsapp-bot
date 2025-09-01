@@ -7,6 +7,7 @@ class WhatsAppBot {
         this.verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
         this.apiVersion = 'v18.0';
         this.baseUrl = `https://graph.facebook.com/${this.apiVersion}`;
+        this.processedMessages = new Set(); // Track processed messages to prevent duplicates
     }
 
     // Verify webhook for WhatsApp
@@ -137,6 +138,22 @@ class WhatsAppBot {
         console.log('Processing message:', JSON.stringify(messageData, null, 2));
         const { from, text, type } = messageData;
         
+        // Create a unique message ID for deduplication
+        const messageId = `${from}_${type}_${JSON.stringify(text)}_${Date.now()}`;
+        
+        // Check if we've already processed this message
+        if (this.processedMessages.has(messageId)) {
+            console.log('Duplicate message detected, skipping:', messageId);
+            return null;
+        }
+        
+        // Add to processed messages (keep only last 100 to prevent memory issues)
+        this.processedMessages.add(messageId);
+        if (this.processedMessages.size > 100) {
+            const firstMessage = this.processedMessages.values().next().value;
+            this.processedMessages.delete(firstMessage);
+        }
+        
         if (type === 'text' && text) {
             // Handle different text message structures
             const messageText = text.body || text.text || text;
@@ -169,20 +186,27 @@ class WhatsAppBot {
             return await this.sendWelcomeMessage(from);
         }
         
-        // For specific route queries (station to station), use AI
+        // For specific queries, use AI
         if (lowerText.includes(' to ') && (lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price'))) {
             return await this.sendAIResponse(from, text);
         }
         
-        // For detailed queries, use AI
-        if (lowerText.includes('list all') || lowerText.includes('all stations') || 
+        // For station-specific queries, use AI
+        if (lowerText.includes('which stations') || lowerText.includes('stations on') || 
+            lowerText.includes('list all') || lowerText.includes('all stations') || 
             lowerText.includes('complete') || lowerText.includes('detailed') ||
+            lowerText.includes('how many') || lowerText.includes('what stations') ||
             lowerText.length > 20) {
             return await this.sendAIResponse(from, text);
         }
         
         // Quick responses for simple queries
-        if (lowerText.includes('route') || lowerText.includes('line') || lowerText.includes('station')) {
+        if (lowerText.includes('route') || lowerText.includes('line')) {
+            return await this.sendRouteInfo(from);
+        }
+        
+        // Only use simple station response for very basic queries
+        if (lowerText.includes('station') && lowerText.length < 15) {
             return await this.sendRouteInfo(from);
         }
         
