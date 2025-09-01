@@ -11,9 +11,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai;
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  console.log('OpenAI initialized successfully');
+} else {
+  console.error('OPENAI_API_KEY environment variable is missing!');
+  console.log('Available environment variables:', Object.keys(process.env).filter(key => key.includes('OPENAI') || key.includes('WHATSAPP')));
+}
 
 // Initialize WhatsApp bot
 const whatsappBot = new WhatsAppBot();
@@ -57,6 +64,10 @@ app.post('/api/chat', async (req, res) => {
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
+    }
+
+    if (!openai) {
+      return res.status(500).json({ error: 'OpenAI service not available. Please check API key configuration.' });
     }
 
     // Create context from knowledge base
@@ -282,6 +293,10 @@ app.post('/api/whatsapp/chat', async (req, res) => {
     
     if (!message || !from) {
       return res.status(400).json({ error: 'Message and from are required' });
+    }
+
+    if (!openai) {
+      return res.status(500).json({ error: 'OpenAI service not available. Please check API key configuration.' });
     }
 
     // Create context from knowledge base
