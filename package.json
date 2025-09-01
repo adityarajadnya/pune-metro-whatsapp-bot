@@ -1,6 +1,6 @@
 {
   "name": "pune-metro-chatbot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Pune Metro Chatbot with Admin Interface",
   "main": "server.js",
   "scripts": {
