@@ -218,15 +218,13 @@ I'm here to help you with all things Pune Metro. What would you like to know?
 • Routes and stations
 • Fares and tickets
 • Schedules and timings
-• Festival special services
 
 Just type your question or use the buttons below!`;
         
         return await this.sendQuickReplies(to, welcomeText, [
             '🚉 Routes & Stations',
             '💰 Fares & Tickets', 
-            '⏰ Schedules',
-            '🎉 Festival Info'
+            '⏰ Schedules'
         ]);
     }
 
