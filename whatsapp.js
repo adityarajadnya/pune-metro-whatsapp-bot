@@ -118,21 +118,34 @@ class WhatsAppBot {
 
     // Process incoming message
     async processMessage(messageData) {
+        console.log('Processing message:', JSON.stringify(messageData, null, 2));
         const { from, text, type } = messageData;
         
         if (type === 'text' && text) {
-            // Process text message
-            return await this.handleTextMessage(from, text.body);
-        } else if (type === 'interactive' && text.interactive?.type === 'button_reply') {
+            // Handle different text message structures
+            const messageText = text.body || text.text || text;
+            if (messageText) {
+                console.log('Processing text message:', messageText);
+                return await this.handleTextMessage(from, messageText);
+            } else {
+                console.log('No text content found in message');
+            }
+        } else if (type === 'interactive' && text?.interactive?.type === 'button_reply') {
             // Process button clicks
             return await this.handleButtonClick(from, text.interactive.button_reply.id);
         }
         
+        console.log('Message type not handled:', type);
         return null;
     }
 
     // Handle text messages
     async handleTextMessage(from, text) {
+        if (!text) {
+            console.log('No text provided to handleTextMessage');
+            return null;
+        }
+        
         const lowerText = text.toLowerCase();
         
         // Welcome message for first interaction
