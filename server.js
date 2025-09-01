@@ -383,9 +383,16 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Initialize and start server
 loadKnowledgeBase().then(() => {
-  app.listen(PORT, () => {
+  console.log('Starting server...');
+  
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Pune Metro Chatbot running on port ${PORT}`);
     console.log(`WhatsApp webhook: /webhook`);
     console.log('Environment variables loaded:', {
@@ -395,6 +402,32 @@ loadKnowledgeBase().then(() => {
       WHATSAPP_VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN ? 'Set' : 'Missing'
     });
   });
+
+  // Handle server errors
+  server.on('error', (error) => {
+    console.error('Server error:', error);
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use`);
+    }
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+
 }).catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);
