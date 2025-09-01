@@ -139,8 +139,8 @@ class WhatsAppBot {
         console.log('Processing message:', JSON.stringify(messageData, null, 2));
         const { from, text, type } = messageData;
         
-        // Create a unique message ID for deduplication
-        const messageId = `${from}_${type}_${JSON.stringify(text)}_${Date.now()}`;
+        // Create a unique message ID for deduplication (without timestamp)
+        const messageId = `${from}_${type}_${JSON.stringify(text)}`;
         
         // Check if we've already processed this message
         if (this.processedMessages.has(messageId)) {
@@ -150,6 +150,7 @@ class WhatsAppBot {
         
         // Add to processed messages (keep only last 100 to prevent memory issues)
         this.processedMessages.add(messageId);
+        console.log('Processing new message:', messageId);
         if (this.processedMessages.size > 100) {
             const firstMessage = this.processedMessages.values().next().value;
             this.processedMessages.delete(firstMessage);
