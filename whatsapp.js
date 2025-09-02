@@ -10,6 +10,7 @@ class WhatsAppBot {
         this.processedMessages = new Set(); // Track processed messages to prevent duplicates
         this.userSessions = new Map(); // Track user sessions to show welcome only once per day
         this.recentMessages = new Map(); // Track recent messages with timestamps
+        this.conversationContext = new Map(); // Track conversation context for each user
     }
 
     // Verify webhook for WhatsApp
@@ -258,6 +259,42 @@ class WhatsAppBot {
         return false;
     }
 
+    // Update conversation context for a user
+    updateConversationContext(from, message, responseType) {
+        if (!this.conversationContext.has(from)) {
+            this.conversationContext.set(from, []);
+        }
+        
+        const context = this.conversationContext.get(from);
+        context.push({
+            message: message,
+            responseType: responseType,
+            timestamp: Date.now()
+        });
+        
+        // Keep only last 5 interactions to maintain context
+        if (context.length > 5) {
+            context.shift();
+        }
+        
+        // Clean up old contexts (older than 1 hour)
+        const oneHourAgo = Date.now() - (60 * 60 * 1000);
+        for (const [userId, userContext] of this.conversationContext.entries()) {
+            const recentContext = userContext.filter(item => item.timestamp > oneHourAgo);
+            if (recentContext.length === 0) {
+                this.conversationContext.delete(userId);
+            } else {
+                this.conversationContext.set(userId, recentContext);
+            }
+        }
+    }
+
+    // Get conversation context for a user
+    getConversationContext(from) {
+        const context = this.conversationContext.get(from) || [];
+        return context.slice(-3); // Return last 3 interactions
+    }
+
     // Handle text messages
     async handleTextMessage(from, text) {
         if (!text) {
@@ -269,11 +306,13 @@ class WhatsAppBot {
         
         // Welcome message only for genuine greetings or first-time interactions
         if (this.isGenuineGreeting(lowerText) && this.shouldShowWelcome(from)) {
+            this.updateConversationContext(from, text, 'welcome');
             return await this.sendWelcomeMessage(from);
         }
         
         // For specific queries, use AI
         if (lowerText.includes(' to ') && (lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price'))) {
+            this.updateConversationContext(from, text, 'fare_query');
             return await this.sendAIResponse(from, text);
         }
         
@@ -283,49 +322,183 @@ class WhatsAppBot {
             lowerText.includes('complete') || lowerText.includes('detailed') ||
             lowerText.includes('how many') || lowerText.includes('what stations') ||
             lowerText.length > 20) {
+            this.updateConversationContext(from, text, 'station_query');
             return await this.sendAIResponse(from, text);
         }
         
         // Quick responses for simple queries
         if (lowerText.includes('route') || lowerText.includes('line')) {
+            this.updateConversationContext(from, text, 'route_info');
             return await this.sendRouteInfo(from);
         }
         
         // Only use simple station response for very basic queries
         if (lowerText.includes('station') && lowerText.length < 15) {
+            this.updateConversationContext(from, text, 'station_info');
             return await this.sendRouteInfo(from);
         }
         
         // Only use simple fare response for general fare queries
         if ((lowerText.includes('fare') || lowerText.includes('cost') || lowerText.includes('price') || lowerText.includes('ticket')) 
             && !lowerText.includes(' to ')) {
+            this.updateConversationContext(from, text, 'fare_info');
             return await this.sendFareInfo(from);
         }
         
         if (lowerText.includes('time') || lowerText.includes('schedule') || lowerText.includes('hour')) {
+            this.updateConversationContext(from, text, 'schedule_info');
             return await this.sendScheduleInfo(from);
         }
         
         if (lowerText.includes('ganesh') || lowerText.includes('festival') || lowerText.includes('ganeshotsav')) {
+            this.updateConversationContext(from, text, 'festival_info');
             return await this.sendFestivalInfo(from);
         }
         
         // Default: use AI for complex queries
+        this.updateConversationContext(from, text, 'ai_response');
         return await this.sendAIResponse(from, text);
     }
 
     // Handle button clicks
     async handleButtonClick(from, buttonId) {
+        const context = this.getConversationContext(from);
+        console.log('Button click context:', context);
+        
         switch (buttonId) {
             case 'qr_0':
-                return await this.sendRouteInfo(from);
+                this.updateConversationContext(from, 'Routes & Stations button', 'button_route');
+                return await this.sendContextualRouteInfo(from, context);
             case 'qr_1':
-                return await this.sendFareInfo(from);
+                this.updateConversationContext(from, 'Fares & Tickets button', 'button_fare');
+                return await this.sendContextualFareInfo(from, context);
             case 'qr_2':
-                return await this.sendScheduleInfo(from);
+                this.updateConversationContext(from, 'Schedules button', 'button_schedule');
+                return await this.sendContextualScheduleInfo(from, context);
             default:
                 return await this.sendOptions(from);
         }
+    }
+
+    // Send contextual route info based on conversation history
+    async sendContextualRouteInfo(from, context) {
+        const recentQuery = context.find(item => 
+            item.responseType === 'station_query' || 
+            item.responseType === 'fare_query' ||
+            item.message.toLowerCase().includes('station') ||
+            item.message.toLowerCase().includes('route')
+        );
+        
+        if (recentQuery) {
+            // If user was asking about specific stations, provide targeted info
+            const message = `Based on your recent query about "${recentQuery.message}", here's the route information:\n\n`;
+            return await this.sendTextMessage(from, message + await this.getRouteInfoText());
+        } else {
+            // Default route info
+            return await this.sendRouteInfo(from);
+        }
+    }
+
+    // Send contextual fare info based on conversation history
+    async sendContextualFareInfo(from, context) {
+        const recentQuery = context.find(item => 
+            item.responseType === 'fare_query' ||
+            item.message.toLowerCase().includes('fare') ||
+            item.message.toLowerCase().includes('cost') ||
+            item.message.toLowerCase().includes('price')
+        );
+        
+        if (recentQuery) {
+            // If user was asking about specific fares, provide targeted info
+            const message = `Based on your recent query about "${recentQuery.message}", here's the fare information:\n\n`;
+            return await this.sendTextMessage(from, message + await this.getFareInfoText());
+        } else {
+            // Default fare info
+            return await this.sendFareInfo(from);
+        }
+    }
+
+    // Send contextual schedule info based on conversation history
+    async sendContextualScheduleInfo(from, context) {
+        const recentQuery = context.find(item => 
+            item.responseType === 'schedule_info' ||
+            item.message.toLowerCase().includes('time') ||
+            item.message.toLowerCase().includes('schedule') ||
+            item.message.toLowerCase().includes('hour')
+        );
+        
+        if (recentQuery) {
+            // If user was asking about specific schedules, provide targeted info
+            const message = `Based on your recent query about "${recentQuery.message}", here's the schedule information:\n\n`;
+            return await this.sendTextMessage(from, message + await this.getScheduleInfoText());
+        } else {
+            // Default schedule info
+            return await this.sendScheduleInfo(from);
+        }
+    }
+
+    // Get route info text (helper function)
+    async getRouteInfoText() {
+        return `🚇 **Pune Metro Routes:**
+
+**Purple Line (PCMC-Swargate):**
+1. PCMC → 2. Sant Tukaram Nagar → 3. Bhosari → 4. Kasarwadi → 5. Phugewadi → 6. Dapodi → 7. Bopodi → 8. Khadki → 9. Shivaji Nagar → 10. Civil Court (District Court) → 11. Pune Railway Station → 12. Budhwar Peth → 13. Mandai → 14. Swargate
+
+**Aqua Line (Vanaz-Ramwadi):**
+1. Vanaz → 2. Anand Nagar → 3. Ideal Colony → 4. Nal Stop → 5. Garware College → 6. Deccan Gymkhana → 7. Chhatrapati Sambhaji Udyan → 8. PMC → 9. Civil Court (District Court) → 10. Mangalwar Peth → 11. Pune Railway Station → 12. Budhwar Peth → 13. Mandai → 14. Swargate → 15. Ramwadi
+
+**Interchange:** Civil Court (District Court) connects both lines
+
+Need specific station details or fare information? Just ask! 😊`;
+    }
+
+    // Get fare info text (helper function)
+    async getFareInfoText() {
+        return `💰 **Pune Metro Fare Structure:**
+
+**Fare Range:** ₹10 - ₹35
+
+**Distance-based Fares:**
+• Short distance (1-3 stations): ₹10-15
+• Medium distance (4-7 stations): ₹20-25
+• Long distance (8+ stations): ₹30-35
+
+**Popular Routes:**
+• PCMC to Swargate: ₹35
+• Vanaz to Ramwadi: ₹35
+• Civil Court to any station: ₹10-25
+
+**Ticket Types:**
+• Single Journey Ticket
+• Return Ticket
+• Smart Card (with discounts)
+
+Need fare for specific stations? Just ask! 😊`;
+    }
+
+    // Get schedule info text (helper function)
+    async getScheduleInfoText() {
+        return `⏰ **Pune Metro Operating Hours:**
+
+**Regular Days:**
+• First Train: 06:00 AM
+• Last Train: 11:00 PM
+• Frequency: Every 5-10 minutes
+
+**Peak Hours (7-10 AM, 6-9 PM):**
+• Frequency: Every 5 minutes
+
+**Off-Peak Hours:**
+• Frequency: Every 8-10 minutes
+
+**Special Events:**
+• Ganeshotsav: Extended hours (06:00 AM - 12:00 AM)
+• Festivals: Check announcements
+
+**Station Operating Hours:**
+• All stations open: 05:45 AM - 11:15 PM
+
+Need specific timing for your route? Just ask! 😊`;
     }
 
     // Send AI-powered response
