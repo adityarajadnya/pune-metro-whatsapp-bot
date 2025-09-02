@@ -189,10 +189,27 @@ class WhatsAppBot {
             } else {
                 console.log('No text content found in message');
             }
-        } else if (type === 'interactive' && text?.interactive?.type === 'button_reply') {
-            // Process button clicks
-            console.log('Button click detected:', text.interactive.button_reply.id);
-            return await this.handleButtonClick(from, text.interactive.button_reply.id);
+        } else if (type === 'interactive') {
+            // Process button clicks - handle different interactive message structures
+            console.log('Interactive message received:', JSON.stringify(messageData, null, 2));
+            
+            // Try to extract button ID from different possible structures
+            let buttonId = null;
+            
+            if (text?.interactive?.type === 'button_reply') {
+                buttonId = text.interactive.button_reply.id;
+            } else if (messageData.interactive?.type === 'button_reply') {
+                buttonId = messageData.interactive.button_reply.id;
+            } else if (messageData.button_reply?.id) {
+                buttonId = messageData.button_reply.id;
+            }
+            
+            if (buttonId) {
+                console.log('Button click detected:', buttonId);
+                return await this.handleButtonClick(from, buttonId);
+            } else {
+                console.log('Interactive message but no button ID found');
+            }
         }
         
         console.log('Message type not handled:', type);

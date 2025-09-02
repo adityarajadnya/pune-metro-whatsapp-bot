@@ -274,14 +274,18 @@ app.post('/webhook', async (req, res) => {
           
           if (change.value && change.value.messages && change.value.messages.length > 0) {
             const message = change.value.messages[0];
+            console.log('Full message from WhatsApp:', JSON.stringify(message, null, 2));
             
             // Process the message
             const messageData = {
               from: message.from,
               text: message.text,
-              type: message.type
+              type: message.type,
+              interactive: message.interactive,
+              button_reply: message.button_reply
             };
             
+            console.log('Processed message data:', JSON.stringify(messageData, null, 2));
             await whatsappBot.processMessage(messageData);
           }
         }
