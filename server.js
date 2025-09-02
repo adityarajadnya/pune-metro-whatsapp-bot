@@ -336,6 +336,27 @@ Aqua Line Stations (in order):
 
 When users ask about "station 4" or "4th station", they mean the 4th station in the sequence (Kasarwadi for Purple Line, Nal Stop for Aqua Line).
 
+FARE CALCULATION SYSTEM:
+- Count stations between origin and destination (excluding origin, including destination)
+- 1-3 stations: ₹10-15
+- 4-7 stations: ₹20-25  
+- 8+ stations: ₹30-35
+- Transfer routes (different lines): Add ₹5-10 for interchange at Civil Court
+- Examples: PCMC to Swargate (13 stations) = ₹35, Dapodi to Shivaji Nagar (3 stations) = ₹15
+
+DURATION CALCULATION:
+- Average time per station: 2-3 minutes
+- Interchange time at Civil Court: 5-10 minutes
+- Direct routes: Stations × 2.5 minutes
+- Transfer routes: (Stations × 2.5) + 7 minutes (interchange time)
+- Examples: PCMC to Swargate (13 stations) = 32-39 minutes, Dapodi to Shivaji Nagar (3 stations) = 6-9 minutes
+
+NEXT TRAIN TIMING:
+- Peak hours (7-10 AM, 6-9 PM): Every 5 minutes
+- Off-peak hours: Every 8-10 minutes
+- First train: 06:00 AM, Last train: 11:00 PM
+- Current time context: Provide realistic next train timing based on typical schedule
+
 Please provide a helpful, accurate response based on the Pune Metro knowledge base. 
 If the information is not available in the knowledge base, say so politely.
 Keep responses concise and informative for WhatsApp format.
@@ -346,7 +367,7 @@ Keep responses concise and informative for WhatsApp format.
       messages: [
         {
           role: "system",
-          content: "You are a helpful Pune Metro assistant with access to comprehensive route information, fares, stations, and policies. You have detailed knowledge of both Purple Line (PCMC-Swargate) and Aqua Line (Vanaz-Ramwadi) including all stations and the interchange at Civil Court. Always provide specific, accurate information from the knowledge base when available. Format responses for WhatsApp with emojis and clear structure.\n\nIMPORTANT: When users refer to station numbers (like '4th station', 'station 4', 'between station 4 and 10'), interpret this as:\n1. If they just saw a numbered list of stations, they likely mean the position in that list (1st, 2nd, 3rd, etc.)\n2. If they mention 'station 4' or '4th station', they mean the 4th station in the sequence (Kasarwadi for Purple Line)\n3. Always clarify which stations you're referring to by name to avoid confusion\n4. For fare queries between numbered stations, show both the station names and the fare amount."
+          content: "You are a helpful Pune Metro assistant with access to comprehensive route information, fares, stations, and policies. You have detailed knowledge of both Purple Line (PCMC-Swargate) and Aqua Line (Vanaz-Ramwadi) including all stations and the interchange at Civil Court. Always provide specific, accurate information from the knowledge base when available. Format responses for WhatsApp with emojis and clear structure.\n\nIMPORTANT: When users refer to station numbers (like '4th station', 'station 4', 'between station 4 and 10'), interpret this as:\n1. If they just saw a numbered list of stations, they likely mean the position in that list (1st, 2nd, 3rd, etc.)\n2. If they mention 'station 4' or '4th station', they mean the 4th station in the sequence (Kasarwadi for Purple Line)\n3. Always clarify which stations you're referring to by name to avoid confusion\n4. For fare queries between numbered stations, show both the station names and the fare amount.\n\nFARE CALCULATION RULES:\n- Calculate fare based on number of stations between origin and destination\n- 1-3 stations: ₹10-15, 4-7 stations: ₹20-25, 8+ stations: ₹30-35\n- For transfer routes (different lines), add ₹5-10 for interchange\n- Always show the exact fare amount and calculation method\n\nDURATION CALCULATION:\n- Average time per station: 2-3 minutes\n- Interchange time at Civil Court: 5-10 minutes\n- Calculate total travel time including interchange if applicable\n- Show both direct route time and transfer route time if different lines\n\nNEXT TRAIN TIMING:\n- Peak hours (7-10 AM, 6-9 PM): Every 5 minutes\n- Off-peak hours: Every 8-10 minutes\n- First train: 06:00 AM, Last train: 11:00 PM\n- Provide next train timing based on current time and station direction"
         },
         {
           role: "user",

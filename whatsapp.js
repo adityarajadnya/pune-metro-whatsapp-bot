@@ -392,7 +392,8 @@ class WhatsAppBot {
         if (recentQuery) {
             // If user was asking about specific stations, provide targeted info
             const message = `Based on your recent query about "${recentQuery.message}", here's the route information:\n\n`;
-            return await this.sendTextMessage(from, message + await this.getRouteInfoText());
+            const routeInfo = await this.getRouteInfoText();
+            return await this.sendTextMessage(from, message + routeInfo);
         } else {
             // Default route info
             return await this.sendRouteInfo(from);
@@ -411,7 +412,8 @@ class WhatsAppBot {
         if (recentQuery) {
             // If user was asking about specific fares, provide targeted info
             const message = `Based on your recent query about "${recentQuery.message}", here's the fare information:\n\n`;
-            return await this.sendTextMessage(from, message + await this.getFareInfoText());
+            const fareInfo = await this.getFareInfoText();
+            return await this.sendTextMessage(from, message + fareInfo);
         } else {
             // Default fare info
             return await this.sendFareInfo(from);
@@ -430,7 +432,8 @@ class WhatsAppBot {
         if (recentQuery) {
             // If user was asking about specific schedules, provide targeted info
             const message = `Based on your recent query about "${recentQuery.message}", here's the schedule information:\n\n`;
-            return await this.sendTextMessage(from, message + await this.getScheduleInfoText());
+            const scheduleInfo = await this.getScheduleInfoText();
+            return await this.sendTextMessage(from, message + scheduleInfo);
         } else {
             // Default schedule info
             return await this.sendScheduleInfo(from);
@@ -498,7 +501,86 @@ Need fare for specific stations? Just ask! 😊`;
 **Station Operating Hours:**
 • All stations open: 05:45 AM - 11:15 PM
 
+**Next Train Timing:**
+• Peak hours: Every 5 minutes
+• Off-peak: Every 8-10 minutes
+• First train: 06:00 AM, Last train: 11:00 PM
+
 Need specific timing for your route? Just ask! 😊`;
+    }
+
+    // Calculate fare between two stations
+    calculateFare(fromStation, toStation) {
+        const purpleLine = ['PCMC', 'Sant Tukaram Nagar', 'Bhosari', 'Kasarwadi', 'Phugewadi', 'Dapodi', 'Bopodi', 'Khadki', 'Shivaji Nagar', 'Civil Court (District Court)', 'Pune Railway Station', 'Budhwar Peth', 'Mandai', 'Swargate'];
+        const aquaLine = ['Vanaz', 'Anand Nagar', 'Ideal Colony', 'Nal Stop', 'Garware College', 'Deccan Gymkhana', 'Chhatrapati Sambhaji Udyan', 'PMC', 'Civil Court (District Court)', 'Mangalwar Peth', 'Pune Railway Station', 'Budhwar Peth', 'Mandai', 'Swargate', 'Ramwadi'];
+        
+        const fromIndexPurple = purpleLine.findIndex(station => station.toLowerCase().includes(fromStation.toLowerCase()));
+        const toIndexPurple = purpleLine.findIndex(station => station.toLowerCase().includes(toStation.toLowerCase()));
+        const fromIndexAqua = aquaLine.findIndex(station => station.toLowerCase().includes(fromStation.toLowerCase()));
+        const toIndexAqua = aquaLine.findIndex(station => station.toLowerCase().includes(toStation.toLowerCase()));
+        
+        // Same line calculation
+        if (fromIndexPurple !== -1 && toIndexPurple !== -1) {
+            const stations = Math.abs(toIndexPurple - fromIndexPurple);
+            return this.getFareByStations(stations, false);
+        }
+        
+        if (fromIndexAqua !== -1 && toIndexAqua !== -1) {
+            const stations = Math.abs(toIndexAqua - fromIndexAqua);
+            return this.getFareByStations(stations, false);
+        }
+        
+        // Transfer calculation (different lines)
+        if ((fromIndexPurple !== -1 && toIndexAqua !== -1) || (fromIndexAqua !== -1 && toIndexPurple !== -1)) {
+            const stations1 = fromIndexPurple !== -1 ? Math.abs(purpleLine.indexOf('Civil Court (District Court)') - fromIndexPurple) : Math.abs(aquaLine.indexOf('Civil Court (District Court)') - fromIndexAqua);
+            const stations2 = toIndexPurple !== -1 ? Math.abs(purpleLine.indexOf('Civil Court (District Court)') - toIndexPurple) : Math.abs(aquaLine.indexOf('Civil Court (District Court)') - toIndexAqua);
+            const totalStations = stations1 + stations2;
+            return this.getFareByStations(totalStations, true);
+        }
+        
+        return null; // Station not found
+    }
+
+    // Get fare based on number of stations
+    getFareByStations(stations, isTransfer) {
+        let baseFare;
+        if (stations <= 3) baseFare = 15;
+        else if (stations <= 7) baseFare = 25;
+        else baseFare = 35;
+        
+        return isTransfer ? baseFare + 5 : baseFare;
+    }
+
+    // Calculate travel duration
+    calculateDuration(fromStation, toStation) {
+        const purpleLine = ['PCMC', 'Sant Tukaram Nagar', 'Bhosari', 'Kasarwadi', 'Phugewadi', 'Dapodi', 'Bopodi', 'Khadki', 'Shivaji Nagar', 'Civil Court (District Court)', 'Pune Railway Station', 'Budhwar Peth', 'Mandai', 'Swargate'];
+        const aquaLine = ['Vanaz', 'Anand Nagar', 'Ideal Colony', 'Nal Stop', 'Garware College', 'Deccan Gymkhana', 'Chhatrapati Sambhaji Udyan', 'PMC', 'Civil Court (District Court)', 'Mangalwar Peth', 'Pune Railway Station', 'Budhwar Peth', 'Mandai', 'Swargate', 'Ramwadi'];
+        
+        const fromIndexPurple = purpleLine.findIndex(station => station.toLowerCase().includes(fromStation.toLowerCase()));
+        const toIndexPurple = purpleLine.findIndex(station => station.toLowerCase().includes(toStation.toLowerCase()));
+        const fromIndexAqua = aquaLine.findIndex(station => station.toLowerCase().includes(fromStation.toLowerCase()));
+        const toIndexAqua = aquaLine.findIndex(station => station.toLowerCase().includes(toStation.toLowerCase()));
+        
+        // Same line calculation
+        if (fromIndexPurple !== -1 && toIndexPurple !== -1) {
+            const stations = Math.abs(toIndexPurple - fromIndexPurple);
+            return stations * 2.5; // 2.5 minutes per station
+        }
+        
+        if (fromIndexAqua !== -1 && toIndexAqua !== -1) {
+            const stations = Math.abs(toIndexAqua - fromIndexAqua);
+            return stations * 2.5;
+        }
+        
+        // Transfer calculation
+        if ((fromIndexPurple !== -1 && toIndexAqua !== -1) || (fromIndexAqua !== -1 && toIndexPurple !== -1)) {
+            const stations1 = fromIndexPurple !== -1 ? Math.abs(purpleLine.indexOf('Civil Court (District Court)') - fromIndexPurple) : Math.abs(aquaLine.indexOf('Civil Court (District Court)') - fromIndexAqua);
+            const stations2 = toIndexPurple !== -1 ? Math.abs(purpleLine.indexOf('Civil Court (District Court)') - toIndexPurple) : Math.abs(aquaLine.indexOf('Civil Court (District Court)') - toIndexAqua);
+            const totalStations = stations1 + stations2;
+            return (totalStations * 2.5) + 7; // Add 7 minutes for interchange
+        }
+        
+        return null;
     }
 
     // Send AI-powered response
