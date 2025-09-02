@@ -327,6 +327,15 @@ IMPORTANT: The knowledge base contains comprehensive route information including
 - Interchange at Civil Court (District Court)
 - Complete station lists for both lines
 
+STATION NUMBERING REFERENCE:
+Purple Line Stations (in order):
+1. PCMC, 2. Sant Tukaram Nagar, 3. Bhosari, 4. Kasarwadi, 5. Phugewadi, 6. Dapodi, 7. Bopodi, 8. Khadki, 9. Shivaji Nagar, 10. Civil Court (District Court), 11. Pune Railway Station, 12. Budhwar Peth, 13. Mandai, 14. Swargate
+
+Aqua Line Stations (in order):
+1. Vanaz, 2. Anand Nagar, 3. Ideal Colony, 4. Nal Stop, 5. Garware College, 6. Deccan Gymkhana, 7. Chhatrapati Sambhaji Udyan, 8. PMC, 9. Civil Court (District Court), 10. Mangalwar Peth, 11. Pune Railway Station, 12. Budhwar Peth, 13. Mandai, 14. Swargate, 15. Ramwadi
+
+When users ask about "station 4" or "4th station", they mean the 4th station in the sequence (Kasarwadi for Purple Line, Nal Stop for Aqua Line).
+
 Please provide a helpful, accurate response based on the Pune Metro knowledge base. 
 If the information is not available in the knowledge base, say so politely.
 Keep responses concise and informative for WhatsApp format.
@@ -337,7 +346,7 @@ Keep responses concise and informative for WhatsApp format.
       messages: [
         {
           role: "system",
-          content: "You are a helpful Pune Metro assistant with access to comprehensive route information, fares, stations, and policies. You have detailed knowledge of both Purple Line (PCMC-Swargate) and Aqua Line (Vanaz-Ramwadi) including all stations and the interchange at Civil Court. Always provide specific, accurate information from the knowledge base when available. Format responses for WhatsApp with emojis and clear structure."
+          content: "You are a helpful Pune Metro assistant with access to comprehensive route information, fares, stations, and policies. You have detailed knowledge of both Purple Line (PCMC-Swargate) and Aqua Line (Vanaz-Ramwadi) including all stations and the interchange at Civil Court. Always provide specific, accurate information from the knowledge base when available. Format responses for WhatsApp with emojis and clear structure.\n\nIMPORTANT: When users refer to station numbers (like '4th station', 'station 4', 'between station 4 and 10'), interpret this as:\n1. If they just saw a numbered list of stations, they likely mean the position in that list (1st, 2nd, 3rd, etc.)\n2. If they mention 'station 4' or '4th station', they mean the 4th station in the sequence (Kasarwadi for Purple Line)\n3. Always clarify which stations you're referring to by name to avoid confusion\n4. For fare queries between numbered stations, show both the station names and the fare amount."
         },
         {
           role: "user",
