@@ -191,6 +191,7 @@ class WhatsAppBot {
             }
         } else if (type === 'interactive' && text?.interactive?.type === 'button_reply') {
             // Process button clicks
+            console.log('Button click detected:', text.interactive.button_reply.id);
             return await this.handleButtonClick(from, text.interactive.button_reply.id);
         }
         
@@ -362,26 +363,32 @@ class WhatsAppBot {
 
     // Handle button clicks
     async handleButtonClick(from, buttonId) {
+        console.log('handleButtonClick called with:', { from, buttonId });
         const context = this.getConversationContext(from);
         console.log('Button click context:', context);
         
         switch (buttonId) {
             case 'qr_0':
+                console.log('Processing Routes & Stations button');
                 this.updateConversationContext(from, 'Routes & Stations button', 'button_route');
                 return await this.sendContextualRouteInfo(from, context);
             case 'qr_1':
+                console.log('Processing Fares & Tickets button');
                 this.updateConversationContext(from, 'Fares & Tickets button', 'button_fare');
                 return await this.sendContextualFareInfo(from, context);
             case 'qr_2':
+                console.log('Processing Schedules button');
                 this.updateConversationContext(from, 'Schedules button', 'button_schedule');
                 return await this.sendContextualScheduleInfo(from, context);
             default:
+                console.log('Unknown button ID:', buttonId);
                 return await this.sendOptions(from);
         }
     }
 
     // Send contextual route info based on conversation history
     async sendContextualRouteInfo(from, context) {
+        console.log('sendContextualRouteInfo called with context:', context);
         const recentQuery = context.find(item => 
             item.responseType === 'station_query' || 
             item.responseType === 'fare_query' ||
@@ -389,14 +396,34 @@ class WhatsAppBot {
             item.message.toLowerCase().includes('route')
         );
         
+        console.log('Recent query found:', recentQuery);
+        
         if (recentQuery) {
             // If user was asking about specific stations, provide targeted info
             const message = `Based on your recent query about "${recentQuery.message}", here's the route information:\n\n`;
             const routeInfo = await this.getRouteInfoText();
+            console.log('Sending contextual route info');
             return await this.sendTextMessage(from, message + routeInfo);
         } else {
             // Default route info
-            return await this.sendRouteInfo(from);
+            console.log('Sending default route info');
+            try {
+                return await this.sendRouteInfo(from);
+            } catch (error) {
+                console.error('Error in sendRouteInfo:', error);
+                // Fallback response
+                return await this.sendTextMessage(from, `🚇 **Pune Metro Routes:**
+
+**Purple Line (PCMC-Swargate):**
+1. PCMC → 2. Sant Tukaram Nagar → 3. Bhosari → 4. Kasarwadi → 5. Phugewadi → 6. Dapodi → 7. Bopodi → 8. Khadki → 9. Shivaji Nagar → 10. Civil Court (District Court) → 11. Pune Railway Station → 12. Budhwar Peth → 13. Mandai → 14. Swargate
+
+**Aqua Line (Vanaz-Ramwadi):**
+1. Vanaz → 2. Anand Nagar → 3. Ideal Colony → 4. Nal Stop → 5. Garware College → 6. Deccan Gymkhana → 7. Chhatrapati Sambhaji Udyan → 8. PMC → 9. Civil Court (District Court) → 10. Mangalwar Peth → 11. Pune Railway Station → 12. Budhwar Peth → 13. Mandai → 14. Swargate → 15. Ramwadi
+
+**Interchange:** Civil Court (District Court) connects both lines
+
+Need specific station details or fare information? Just ask! 😊`);
+            }
         }
     }
 
@@ -416,7 +443,32 @@ class WhatsAppBot {
             return await this.sendTextMessage(from, message + fareInfo);
         } else {
             // Default fare info
-            return await this.sendFareInfo(from);
+            try {
+                return await this.sendFareInfo(from);
+            } catch (error) {
+                console.error('Error in sendFareInfo:', error);
+                // Fallback response
+                return await this.sendTextMessage(from, `💰 **Pune Metro Fare Structure:**
+
+**Fare Range:** ₹10 - ₹35
+
+**Distance-based Fares:**
+• Short distance (1-3 stations): ₹10-15
+• Medium distance (4-7 stations): ₹20-25
+• Long distance (8+ stations): ₹30-35
+
+**Popular Routes:**
+• PCMC to Swargate: ₹35
+• Vanaz to Ramwadi: ₹35
+• Civil Court to any station: ₹10-25
+
+**Ticket Types:**
+• Single Journey Ticket
+• Return Ticket
+• Smart Card (with discounts)
+
+Need fare for specific stations? Just ask! 😊`);
+            }
         }
     }
 
@@ -436,7 +488,38 @@ class WhatsAppBot {
             return await this.sendTextMessage(from, message + scheduleInfo);
         } else {
             // Default schedule info
-            return await this.sendScheduleInfo(from);
+            try {
+                return await this.sendScheduleInfo(from);
+            } catch (error) {
+                console.error('Error in sendScheduleInfo:', error);
+                // Fallback response
+                return await this.sendTextMessage(from, `⏰ **Pune Metro Operating Hours:**
+
+**Regular Days:**
+• First Train: 06:00 AM
+• Last Train: 11:00 PM
+• Frequency: Every 5-10 minutes
+
+**Peak Hours (7-10 AM, 6-9 PM):**
+• Frequency: Every 5 minutes
+
+**Off-Peak Hours:**
+• Frequency: Every 8-10 minutes
+
+**Special Events:**
+• Ganeshotsav: Extended hours (06:00 AM - 12:00 AM)
+• Festivals: Check announcements
+
+**Station Operating Hours:**
+• All stations open: 05:45 AM - 11:15 PM
+
+**Next Train Timing:**
+• Peak hours: Every 5 minutes
+• Off-peak: Every 8-10 minutes
+• First train: 06:00 AM, Last train: 11:00 PM
+
+Need specific timing for your route? Just ask! 😊`);
+            }
         }
     }
 
