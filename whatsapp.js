@@ -446,6 +446,7 @@ Need specific station details or fare information? Just ask! 😊`);
 
     // Send contextual fare info based on conversation history
     async sendContextualFareInfo(from, context) {
+        console.log('sendContextualFareInfo called with context:', context);
         const recentQuery = context.find(item => 
             item.responseType === 'fare_query' ||
             item.message.toLowerCase().includes('fare') ||
@@ -453,18 +454,23 @@ Need specific station details or fare information? Just ask! 😊`);
             item.message.toLowerCase().includes('price')
         );
         
+        console.log('Recent fare query found:', recentQuery);
+        
         if (recentQuery) {
             // If user was asking about specific fares, provide targeted info
             const message = `Based on your recent query about "${recentQuery.message}", here's the fare information:\n\n`;
             const fareInfo = await this.getFareInfoText();
+            console.log('Sending contextual fare info');
             return await this.sendTextMessage(from, message + fareInfo);
         } else {
             // Default fare info
+            console.log('Sending default fare info');
             try {
                 return await this.sendFareInfo(from);
             } catch (error) {
                 console.error('Error in sendFareInfo:', error);
                 // Fallback response
+                console.log('Using fallback fare response');
                 return await this.sendTextMessage(from, `💰 **Pune Metro Fare Structure:**
 
 **Fare Range:** ₹10 - ₹35
@@ -491,6 +497,7 @@ Need fare for specific stations? Just ask! 😊`);
 
     // Send contextual schedule info based on conversation history
     async sendContextualScheduleInfo(from, context) {
+        console.log('sendContextualScheduleInfo called with context:', context);
         const recentQuery = context.find(item => 
             item.responseType === 'schedule_info' ||
             item.message.toLowerCase().includes('time') ||
@@ -498,18 +505,23 @@ Need fare for specific stations? Just ask! 😊`);
             item.message.toLowerCase().includes('hour')
         );
         
+        console.log('Recent schedule query found:', recentQuery);
+        
         if (recentQuery) {
             // If user was asking about specific schedules, provide targeted info
             const message = `Based on your recent query about "${recentQuery.message}", here's the schedule information:\n\n`;
             const scheduleInfo = await this.getScheduleInfoText();
+            console.log('Sending contextual schedule info');
             return await this.sendTextMessage(from, message + scheduleInfo);
         } else {
             // Default schedule info
+            console.log('Sending default schedule info');
             try {
                 return await this.sendScheduleInfo(from);
             } catch (error) {
                 console.error('Error in sendScheduleInfo:', error);
                 // Fallback response
+                console.log('Using fallback schedule response');
                 return await this.sendTextMessage(from, `⏰ **Pune Metro Operating Hours:**
 
 **Regular Days:**
